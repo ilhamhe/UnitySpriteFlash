@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class SpriteFlash : MonoBehaviour {
 
-	public float flashSpeed;
+    public Color flashColor;
+	public float flashDuration;
 
 	Material mat;
 
-	bool isFlashing = false;
+    private IEnumerator flashCoroutine;
 
 	private void Awake() {
 		mat = GetComponent<SpriteRenderer>().material;
@@ -20,20 +21,31 @@ public class SpriteFlash : MonoBehaviour {
 	}
 
 	private void Flash(){
-		StartCoroutine(DoFlash());
-	}
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
 
-	IEnumerator DoFlash(){
-		isFlashing = false;
-		yield return new WaitForEndOfFrame();
-		isFlashing = true;
-		float flash = 1f;
-		while (isFlashing && flash >=0)
-		{
-			flash -= Time.deltaTime * flashSpeed;
-			mat.SetFloat("_FlashAmount", flash);
-			yield return null;
-		}
-		isFlashing = false;
-	}
+        flashCoroutine = DoFlash();
+        StartCoroutine(flashCoroutine);
+    }
+
+
+    private IEnumerator DoFlash()
+    {
+        float lerpTime = 0;
+
+        while (lerpTime < flashDuration)
+        {
+            lerpTime += Time.deltaTime;
+            float perc = lerpTime / flashDuration;
+
+            SetFlashAmount(1f - perc);
+            yield return null;
+        }
+        SetFlashAmount(0);
+    }
+    private void SetFlashAmount(float flashAmount)
+    {
+        mat.SetFloat("_FlashAmount", flashAmount);
+    }
+
 }
