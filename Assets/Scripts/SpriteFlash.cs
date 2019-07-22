@@ -15,7 +15,12 @@ public class SpriteFlash : MonoBehaviour {
 		mat = GetComponent<SpriteRenderer>().material;
 	}
 
-	private void Update() {
+    private void Start()
+    {
+        mat.SetColor("_FlashColor", flashColor);
+    }
+
+    private void Update() {
 		if(Input.GetKeyDown(KeyCode.Space))
 			Flash();
 	}
